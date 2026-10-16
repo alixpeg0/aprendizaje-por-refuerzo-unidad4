@@ -11,6 +11,7 @@ Cuaderno de trabajo resuelto · Maestría en Inteligencia Artificial · TecNM Vi
 | [`Unidad4_Aprendizaje_por_Refuerzo.ipynb`](Unidad4_Aprendizaje_por_Refuerzo.ipynb) | **Notebook de Colab**: teoría, esquema y Actividades 25–30 resueltas con código |
 | [`pdfs/Unidad4_Aprendizaje_por_Refuerzo_Completo.pdf`](pdfs/Unidad4_Aprendizaje_por_Refuerzo_Completo.pdf) | **PDF único vertical**: teoría, esquema y cada actividad paso a paso con código y salida |
 | [`pdfs/Unidad4_Aprendizaje_por_Refuerzo_TecNM_con_Introduccion.pdf`](pdfs/Unidad4_Aprendizaje_por_Refuerzo_TecNM_con_Introduccion.pdf) | **PDF 16:9 con fondo TecNM**: introducción con diagramas y fórmulas, teoría detallada, gráficos y código por actividad |
+| [`pdfs/Guia_Explicativa_de_Diapositivas.pdf`](pdfs/Guia_Explicativa_de_Diapositivas.pdf) | **Guía de estudio**: explicación de cada una de las 34 diapositivas (qué muestra, paso a paso e idea clave) |
 | [`pdfs/`](pdfs) | Además, un PDF entregable por actividad (25 a 30) |
 | [`imagenes/esquema_teoria.png`](imagenes/esquema_teoria.png) | Esquema de la teoría |
 | `rl_core.py`, `contenido.py` | Código y respuestas compartidos por el notebook y los PDFs |
