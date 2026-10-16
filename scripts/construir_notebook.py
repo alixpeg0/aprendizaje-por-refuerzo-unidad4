@@ -33,6 +33,20 @@ def tabla(columnas, filas):
     return pd.DataFrame(filas, columns=columnas)
 """)
 
+# --------------------------------------------------------------- INTRODUCCION
+md("# Introducción: la unidad en diagramas y fórmulas")
+md("## Mapa de la unidad\nTres bloques que van del vocabulario (4.1), a los algoritmos (4.2) y al análisis de tipos y modelos (4.3); cada uno con dos actividades.")
+code("figura_mapa_unidad(); plt.show()")
+md("## Cómo aprende un agente: flujo de Q-learning\nEl agente repite los pasos 2-7 durante muchos episodios; Q se acerca a Q* y la política greedy se vuelve óptima.")
+code("figura_flujo_qlearning(); plt.show()")
+md("## Fórmulas esenciales\nCada tarjeta trae la fórmula, su significado y un ejemplo numérico de este cuaderno.")
+code("figura_formulas(1); plt.show()")
+code("figura_formulas(2); plt.show()")
+md("## Los parámetros γ, α y ε\n- **γ**: cuánto pesa el futuro (horizonte efectivo ≈ 1/(1−γ)).\n- **α**: qué fracción del error se corrige en cada actualización.\n- **ε**: probabilidad de explorar con una acción al azar.")
+code("figura_parametros(); plt.show()")
+md("## Gráfico explicativo: anatomía de una actualización de Q-learning\nSe desglosa el paso 4 de la Actividad 27: experiencia (S3, Izquierda, +5, S2), cada pieza de la fórmula con su valor, el objetivo, el error TD y cómo Q se mueve una fracción α hacia el objetivo.")
+code("figura_anatomia_update(); plt.show()")
+
 # --------------------------------------------------------------- TEORIA
 teoria = (raiz / "teoria.md").read_text(encoding="utf-8").replace("![Esquema de la teoría](imagenes/esquema_teoria.png)", "*(El esquema se dibuja en la siguiente sección.)*")
 md("# 1. Teoría\n" + teoria.replace("## Teoría paso a paso", "", 1))

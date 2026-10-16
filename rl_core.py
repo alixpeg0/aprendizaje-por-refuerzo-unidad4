@@ -417,3 +417,236 @@ def figura_skybot():
     axs[1].invert_xaxis(); axs[1].grid(alpha=.3); axs[1].legend()
     fig.tight_layout()
     return fig
+
+
+# ----------------------------------------------------------------------------
+# 7. Figuras de la introducción (mapa de la unidad, flujo, fórmulas, parámetros)
+# ----------------------------------------------------------------------------
+def _panel(ax, xy, w, h, titulo, items, color, tam=10.5):
+    ax.add_patch(FancyBboxPatch(xy, w, h, boxstyle="round,pad=0.02,rounding_size=0.15",
+                                fc=GRIS, ec=color, lw=2))
+    ax.add_patch(FancyBboxPatch((xy[0], xy[1] + h - 0.8), w, 0.8, boxstyle="round,pad=0.02,rounding_size=0.15",
+                                fc=color, ec=color, lw=2))
+    ax.text(xy[0] + w / 2, xy[1] + h - 0.4, titulo, ha="center", va="center", color="white",
+            fontsize=11.5, fontweight="bold")
+    for i, t in enumerate(items):
+        ax.text(xy[0] + 0.25, xy[1] + h - 1.25 - i * 0.48, "•  " + t, va="center", fontsize=tam)
+
+
+def figura_mapa_unidad():
+    """Introducción: mapa de toda la unidad y de las actividades."""
+    fig, ax = plt.subplots(figsize=(14, 7.2))
+    ax.set_xlim(0, 14); ax.set_ylim(0, 7.2); ax.axis("off")
+    _caja(ax, (0.3, 6.15), 13.4, 0.85,
+          "Aprendizaje por refuerzo: un agente aprende a decidir interactuando con un entorno,\n"
+          "con el fin de maximizar la recompensa acumulada", AZUL, 11.5)
+    cols = [
+        (0.3, "4.1  Definición y conceptos básicos", GUINDA,
+         ["Medio ambiente", "Estado y acción", "Recompensa", "Política π", "Valor V(s) y función de valor"],
+         "Act. 25 · 26", "VOCABULARIO: identificar y diseñar\nlos elementos de un problema de RL"),
+        (4.95, "4.2  Algoritmos de aprendizaje reforzado", AZUL,
+         ["Basados en valores (Q-learning, DQN)", "Basados en políticas (REINFORCE, PPO)",
+          "Basados en modelos (Dyna-Q)", "Ecuación de Bellman", "Cómo elegir el algoritmo"],
+         "Act. 27 · 28", "CÁLCULO: aplicar Bellman y elegir\nel algoritmo adecuado"),
+        (9.6, "4.3  Tipos y modelos de refuerzo", GUINDA,
+         ["Refuerzo positivo y negativo", "Procesos de Markov (MDP)", "Q-learning paso a paso",
+          "Sensibilidad a la recompensa", "Política y adaptación en el tiempo"],
+         "Act. 29 · 30", "ANÁLISIS: interpretar cambios y\ndiseñar un agente propio"),
+    ]
+    for x, t, c, items, act, meta in cols:
+        _panel(ax, (x, 2.55), 4.1, 3.3, t, items, c, 9.6)
+        _caja(ax, (x + 1.05, 2.0), 2.0, 0.5, act, DORADO, 10)
+        ax.text(x + 2.05, 1.05, meta, ha="center", va="center", fontsize=9.5, color=c, fontweight="bold")
+    _flecha(ax, (4.45, 4.2), (4.9, 4.2)); _flecha(ax, (9.1, 4.2), (9.55, 4.2))
+    ax.text(7.0, 0.25, "Idea central:  Estado → Acción → Recompensa → Nuevo estado → Aprender  (ciclo que se repite)",
+            ha="center", fontsize=11, style="italic", color="#333")
+    fig.tight_layout()
+    return fig
+
+
+def figura_flujo_qlearning():
+    """Introducción: diagrama de flujo del algoritmo Q-learning."""
+    fig, ax = plt.subplots(figsize=(14, 6.3))
+    ax.set_xlim(0, 14); ax.set_ylim(0, 6.3); ax.axis("off")
+    pasos = [
+        ("1  Inicializar", "Q(s,a) = 0 para\ntodo s, a", AZUL, (0.4, 3.9)),
+        ("2  Observar estado", "s = estado actual\ndel entorno", GUINDA, (3.9, 3.9)),
+        ("3  Elegir acción", "ε-greedy: azar con prob. ε,\nmejor Q con prob. 1−ε", AZUL, (7.4, 3.9)),
+        ("4  Ejecutar", "el entorno devuelve\nr y el nuevo estado s'", GUINDA, (10.9, 3.9)),
+        ("5  Calcular objetivo", "y = r + γ · max Q(s',·)", AZUL, (10.9, 1.5)),
+        ("6  Actualizar Q", "Q ← Q + α·(y − Q)", GUINDA, (7.4, 1.5)),
+        ("7  Avanzar", "s ← s'  ¿fin del\nepisodio?", AZUL, (3.9, 1.5)),
+    ]
+    for t, d, c, (x, y) in pasos:
+        ax.add_patch(FancyBboxPatch((x, y), 3.0, 1.55, boxstyle="round,pad=0.02,rounding_size=0.15", fc=c, ec="none"))
+        ax.text(x + 1.5, y + 1.15, t, ha="center", va="center", color="white", fontsize=11, fontweight="bold")
+        ax.text(x + 1.5, y + 0.5, d, ha="center", va="center", color="white", fontsize=9)
+    for p, q in [((3.4, 4.7), (3.9, 4.7)), ((6.9, 4.7), (7.4, 4.7)), ((10.4, 4.7), (10.9, 4.7)),
+                 ((12.4, 3.9), (12.4, 3.05)), ((10.9, 2.3), (10.4, 2.3)), ((7.4, 2.3), (6.9, 2.3))]:
+        _flecha(ax, p, q)
+    _flecha(ax, (5.4, 3.05), (5.4, 3.9), "no: repetir", color=GUINDA)
+    ax.text(5.4, 0.95, "sí: terminar el episodio y empezar otro", ha="center", fontsize=9.5, color=AZUL)
+    ax.text(7.0, 0.3, "Se repite durante muchos episodios: Q converge a Q* y la política greedy se vuelve óptima.",
+            ha="center", fontsize=10.5, style="italic")
+    ax.text(7.0, 6.0, "Algoritmo Q-learning (off-policy)", ha="center", fontsize=13, fontweight="bold", color=AZUL)
+    fig.tight_layout()
+    return fig
+
+
+_TARJETAS = {
+    1: [
+        ("1. Retorno descontado",
+         r"$G_t = r_{t+1} + \gamma\, r_{t+2} + \gamma^{2} r_{t+3} + \cdots = \sum_{k=0}^{\infty} \gamma^{k}\, r_{t+k+1}$",
+         "Suma de las recompensas futuras; cada una pesa γᵏ,\npor lo que lo lejano vale menos (0 ≤ γ ≤ 1).",
+         "r = (1, 1, 10) y γ = 0.9  →  G = 1 + 0.9·1 + 0.81·10 = 10.0"),
+        ("2. Valor de un estado",
+         r"$V^{\pi}(s) = \mathbb{E}_{\pi}\,[\,G_t \mid s_t = s\,]$",
+         "Retorno que se espera obtener empezando en s\ny siguiendo la política π.",
+         "π = «siempre Quedarse», r = 3  →  V(S3) = 3 / (1 − 0.9) = 30"),
+        ("3. Valor de una acción",
+         r"$Q^{\pi}(s,a) = \mathbb{E}_{\pi}\,[\,G_t \mid s_t = s,\ a_t = a\,]$" "\n\n"
+         r"$V^{\pi}(s) = \sum_{a} \pi(a \mid s)\; Q^{\pi}(s,a)$",
+         "Como V, pero fijando primero la acción a:\npermite comparar acciones entre sí.",
+         "Q*(S3, Izq) = 31.05  >  Q*(S3, Quedarse) = 30.95  →  conviene Izquierda"),
+        ("4. Ecuación de Bellman óptima",
+         r"$Q^{*}(s,a) = \mathbb{E}\,[\,r + \gamma \max_{a'} Q^{*}(s',a')\,]$",
+         "Valor de (s,a) = recompensa inmediata +\nvalor descontado de lo mejor que se puede hacer después.",
+         "Q*(S3, Izq) = 5 + 0.9 · V*(S2) = 5 + 0.9 · 28.95 = 31.05"),
+    ],
+    2: [
+        ("5. Actualización de Q-learning",
+         r"$Q(s,a) \leftarrow Q(s,a) + \alpha\,[\,r + \gamma \max_{a'} Q(s',a') - Q(s,a)\,]$" "\n\n"
+         r"$= (1-\alpha)\,Q(s,a) + \alpha \cdot \mathrm{objetivo}$",
+         "Acerca Q hacia el objetivo una fracción α\ndel error: es un promedio ponderado viejo/nuevo.",
+         "Q = 0 + 0.5 · (5 + 0.9 · 0.5 − 0) = 2.725   (paso 4, Act. 27)"),
+        ("6. Error TD (diferencia temporal)",
+         r"$\delta = r + \gamma \max_{a'} Q(s',a') - Q(s,a)$",
+         "Qué tan equivocada estaba la estimación. Si δ = 0\nla tabla ya cumple la ecuación de Bellman.",
+         "δ = 5 + 0.9 · 0.5 − 0 = 5.45"),
+        ("7. Política codiciosa y ε-greedy",
+         r"$\pi^{*}(s) = \mathrm{argmax}_{a}\; Q^{*}(s,a)$" "\n\n"
+         r"$\pi_{\varepsilon}(a^{*}\!\mid s) = 1 - \varepsilon + \varepsilon/|A|$" "     "
+         r"$\pi_{\varepsilon}(a \neq a^{*}\!\mid s) = \varepsilon/|A|$",
+         "Elegir la acción de mayor Q (explotar) pero explorar\ncon probabilidad ε para descubrir algo mejor.",
+         "ε = 0.2 y |A| = 3  →  mejor acción 86.7 %, cada otra 6.7 %"),
+        ("8. Recompensa constante y MDP",
+         r"$V = \sum_{k=0}^{\infty} \gamma^{k}\, r = \dfrac{r}{1-\gamma}$" "      "
+         r"$\mathrm{MDP} = (S,\,A,\,P,\,R,\,\gamma)$",
+         "Serie geométrica: el horizonte efectivo es ≈ 1/(1−γ) pasos.\nMarkov: P(s'|s,a) solo depende de (s, a).",
+         "r = 3 → V = 30;   r = 6 → V = 60   (Actividad 29)"),
+    ],
+}
+
+
+def figura_formulas(parte=1):
+    """Introducción: hojas de fórmulas con significado y ejemplo numérico."""
+    fig, axs = plt.subplots(2, 2, figsize=(14, 7.6))
+    for ax, (t, f, sig, ej) in zip(axs.ravel(), _TARJETAS[parte]):
+        ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.set_xticks([]); ax.set_yticks([])
+        for sp in ax.spines.values():
+            sp.set_edgecolor(AZUL if parte == 1 else GUINDA); sp.set_linewidth(2)
+        ax.set_facecolor("#FBFBFD")
+        ax.text(0.03, 0.92, t, fontsize=11.5, fontweight="bold", color=GUINDA if parte == 1 else AZUL, va="center")
+        ax.text(0.5, 0.62, f, fontsize=14, ha="center", va="center", color="#111", linespacing=1.4)
+        ax.text(0.03, 0.31, "Significa: " + sig, fontsize=10, va="center", color="#333")
+        ax.text(0.03, 0.09, "Ejemplo: " + ej, fontsize=10, va="center", color=DORADO, fontweight="bold")
+    fig.tight_layout(pad=1.2)
+    return fig
+
+
+def figura_parametros():
+    """Introducción: efecto de γ, α y ε."""
+    fig, axs = plt.subplots(1, 3, figsize=(15, 4.6))
+    k = np.arange(0, 16)
+    for g, c in ((0.5, "#B5532A"), (0.9, AZUL), (0.99, "#2E7D4F")):
+        axs[0].plot(k, g ** k, "-o", ms=4, color=c, lw=2, label=f"γ = {g}")
+    axs[0].annotate("0.9¹⁰ = 0.35:\nuna recompensa a 10 pasos\nvale 35 % con γ = 0.9", (10, 0.9 ** 10),
+                    (6.0, 0.62), arrowprops=dict(arrowstyle="->"), fontsize=8.5)
+    axs[0].set(title="γ (descuento): cuánto pesa el futuro", xlabel="pasos hacia el futuro k",
+               ylabel="peso γᵏ de la recompensa")
+    axs[0].legend(loc="center right"); axs[0].grid(alpha=.3)
+    n = np.arange(0, 11)
+    for a, c in ((0.1, "#B5532A"), (0.5, AZUL), (1.0, "#2E7D4F")):
+        axs[1].plot(n, 5.45 * (1 - (1 - a) ** n), "-o", ms=4, color=c, lw=2, label=f"α = {a}")
+    axs[1].axhline(5.45, color="gray", ls="--"); axs[1].text(6.3, 5.62, "objetivo = 5.45", fontsize=9); axs[1].set_ylim(0, 6.4)
+    axs[1].set(title="α (tasa de aprendizaje): rapidez para corregir", xlabel="actualizaciones con el mismo objetivo",
+               ylabel="valor Q")
+    axs[1].legend(); axs[1].grid(alpha=.3)
+    eps = [1.0, 0.5, 0.2, 0.05]
+    mejor = [(1 - e) + e / 3 for e in eps]
+    otras = [e / 3 for e in eps]
+    x = np.arange(len(eps))
+    axs[2].bar(x, [100 * m for m in mejor], color=AZUL, label="mejor acción (explotar)")
+    axs[2].bar(x, [200 * o for o in otras], bottom=[100 * m for m in mejor], color=DORADO, label="las otras 2 (explorar)")
+    for i, m in enumerate(mejor):
+        axs[2].text(i, 100 * m / 2, f"{100 * m:.0f} %", ha="center", color="white", fontweight="bold")
+    axs[2].set_xticks(x); axs[2].set_xticklabels([f"ε = {e}" for e in eps])
+    axs[2].set(title="ε (exploración): probabilidad de elegir", ylabel="% de decisiones", ylim=(0, 135))
+    axs[2].legend(loc="upper center", fontsize=8)
+    fig.tight_layout()
+    return fig
+
+
+def figura_anatomia_update(alpha=0.5, gamma=0.9):
+    """Gráfico explicativo: anatomía de UNA actualización de Q-learning (paso 4 de la Act. 27)."""
+    q_old, r, max_next = 0.0, 5.0, 0.5
+    objetivo = r + gamma * max_next
+    delta = objetivo - q_old
+    q_new = q_old + alpha * delta
+    fig, ax = plt.subplots(figsize=(15, 8.2))
+    ax.set_xlim(0, 15); ax.set_ylim(-0.6, 8.4); ax.axis("off")
+
+    # A) la experiencia
+    ax.text(0.2, 8.1, "A) La experiencia (s, a, r, s')", fontsize=12, fontweight="bold", color=GUINDA)
+    for i, (n, c) in enumerate((("S1", "#8896B3"), ("S2", AZUL), ("S3", GUINDA))):
+        _caja(ax, (0.6 + i * 2.1, 6.55), 1.6, 0.8, n, c, 12)
+    ax.add_patch(FancyArrowPatch((5.0, 7.45), (2.9, 7.45), connectionstyle="arc3,rad=0.45", arrowstyle="-|>",
+                                 mutation_scale=20, lw=2.5, color=DORADO))
+    ax.text(3.95, 7.95, "a = Izquierda,  r = +5", ha="center", fontsize=10, fontweight="bold", color=DORADO)
+    ax.text(5.0, 6.2, "agente en s = S3", ha="center", fontsize=8.5)
+    ax.text(2.7, 6.2, "llega a s' = S2", ha="center", fontsize=8.5)
+    ax.text(7.2, 7.5, "Lo que ya sabe la tabla Q:", fontsize=10, fontweight="bold")
+    ax.text(7.2, 7.0, f"Q(S3, Izquierda) = {q_old:g}   (aún no ha probado esta acción)", fontsize=10)
+    ax.text(7.2, 6.55, f"max Q(S2, ·) = {max_next:g}   (lo mejor que conoce desde S2)", fontsize=10)
+
+    # B) la fórmula coloreada
+    ax.text(0.2, 5.65, "B) La fórmula, pieza por pieza", fontsize=12, fontweight="bold", color=GUINDA)
+    toks = [(0.9, "Qnuevo", f"{q_new:g}", "#2E7D4F", "resultado"), (1.9, "=", "", "k", ""),
+            (3.0, "Qviejo", f"{q_old:g}", AZUL, "estimación\nactual"), (4.0, "+", "", "k", ""),
+            (5.0, "α", f"{alpha:g}", DORADO, "tasa de\naprendizaje"), (5.9, "·[", "", "k", ""),
+            (6.8, "r", f"{r:g}", GUINDA, "recompensa\ninmediata"), (7.7, "+", "", "k", ""),
+            (8.6, "γ", f"{gamma:g}", DORADO, "factor de\ndescuento"), (9.4, "·", "", "k", ""),
+            (10.7, "max Q(s',·)", f"{max_next:g}", AZUL, "mejor valor\ndel siguiente estado"),
+            (12.1, "−", "", "k", ""), (13.0, "Qviejo", f"{q_old:g}", AZUL, "estimación\nactual"), (14.0, "]", "", "k", "")]
+    for x, s, v, c, lab in toks:
+        ax.text(x, 4.95, s, ha="center", va="center", fontsize=13.5, fontweight="bold", color=c)
+        if v:
+            ax.text(x, 4.4, v, ha="center", va="center", fontsize=13, color=c)
+        if lab:
+            ax.text(x, 3.8, lab, ha="center", va="center", fontsize=7.8, color=c)
+    ax.plot([6.5, 11.9], [3.3, 3.3], color=GUINDA, lw=2)
+    ax.text(9.2, 3.05, f"OBJETIVO  y = r + γ·max Q(s',·) = {r:g} + {gamma:g}·{max_next:g} = {objetivo:.2f}",
+            ha="center", fontsize=9.8, color=GUINDA, fontweight="bold")
+    ax.plot([6.5, 13.8], [2.65, 2.65], color=AZUL, lw=2)
+    ax.text(10.15, 2.4, f"ERROR TD  δ = y − Qviejo = {objetivo:.2f} − {q_old:g} = {delta:.2f}",
+            ha="center", fontsize=9.8, color=AZUL, fontweight="bold")
+
+    # C) el resultado en una recta numérica
+    ax.text(0.2, 1.95, "C) ¿Qué hace la actualización? Mueve Q hacia el objetivo una fracción α del error", fontsize=12,
+            fontweight="bold", color=GUINDA)
+    x0, esc = 1.0, 2.35                     # 0 -> x0, 6 -> x0 + 6*esc
+    ax.plot([x0, x0 + 6 * esc], [0.9, 0.9], color="black", lw=1.5)
+    for v in range(0, 7):
+        ax.plot([x0 + v * esc] * 2, [0.82, 0.98], color="black", lw=1)
+        ax.text(x0 + v * esc, 0.55, str(v), ha="center", fontsize=9)
+    X = lambda v: x0 + v * esc
+    ax.plot(X(q_old), 0.9, "o", ms=13, color=AZUL); ax.text(X(q_old), 1.25, "Qviejo = 0", ha="center", color=AZUL, fontsize=9.5, fontweight="bold")
+    ax.plot(X(objetivo), 0.9, "o", ms=13, color=GUINDA); ax.text(X(objetivo), 1.25, f"objetivo = {objetivo:.2f}", ha="center", color=GUINDA, fontsize=9.5, fontweight="bold")
+    ax.plot(X(q_new), 0.9, "o", ms=13, color="#2E7D4F"); ax.text(X(q_new), 1.25, f"Qnuevo = {q_new:.3f}", ha="center", color="#2E7D4F", fontsize=9.5, fontweight="bold")
+    ax.annotate("", (X(q_new), 0.1), (X(q_old), 0.1), arrowprops=dict(arrowstyle="-|>", color="#2E7D4F", lw=2.2))
+    ax.text((X(q_old) + X(q_new)) / 2, -0.3, f"paso real = α·δ = {alpha:g}·{delta:.2f} = {alpha * delta:.3f}", ha="center",
+            fontsize=9.3, color="#2E7D4F", fontweight="bold")
+    ax.annotate("", (X(objetivo), 0.1), (X(q_new), 0.1), arrowprops=dict(arrowstyle="-|>", color="#999", lw=2, ls="--"))
+    ax.text((X(q_new) + X(objetivo)) / 2, -0.3, "lo que falta (se corrige en futuras visitas)", ha="center", fontsize=8.5, color="#777")
+    fig.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.02)
+    return fig

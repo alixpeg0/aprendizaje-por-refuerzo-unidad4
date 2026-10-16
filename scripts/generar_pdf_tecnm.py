@@ -46,7 +46,7 @@ def fondo(c, d):
     c.drawImage(FONDO, 0, 0, width=PW, height=PH)
 
 
-doc = BaseDocTemplate(str(raiz / "pdfs" / "Unidad4_Aprendizaje_por_Refuerzo_Formato_TecNM.pdf"),
+doc = BaseDocTemplate(str(raiz / "pdfs" / "Unidad4_Aprendizaje_por_Refuerzo_TecNM_con_Introduccion.pdf"),
                       pagesize=(PW, PH), title="Unidad 4 - Aprendizaje por Refuerzo", author=NOMBRE,
                       leftMargin=0, rightMargin=0, topMargin=0, bottomMargin=0)
 doc.addPageTemplates([PageTemplate(id="tecnm", frames=[Frame(FX, FY, FW, FH, leftPadding=0, rightPadding=0,
@@ -131,6 +131,7 @@ E += [Spacer(1, 70), Paragraph("Aprendizaje por Refuerzo", sT),
       Paragraph(f"Aprendizaje Automático · Maestría en Inteligencia Artificial · TecNM Virtual<br/>Alumno(a): {NOMBRE}", sM),
       Spacer(1, 18)]
 tabla(["Sección", "Contenido"], [
+    ["Intro", "Mapa de la unidad, flujo de Q-learning, fórmulas, parámetros y gráfico explicativo"],
     ["1", "Teoría general paso a paso y esquema"], ["2", "Actividad 25 · Elementos del RL en tres ejemplos"],
     ["3", "Actividad 26 · Entorno propio (AspiBot)"], ["4", "Actividad 27 · Una iteración de Q-learning"],
     ["5", "Actividad 28 · Agente y elección de algoritmo"], ["6", "Actividad 29 · Nueva tabla Q (S3: +3 → +6)"],
@@ -138,6 +139,50 @@ tabla(["Sección", "Contenido"], [
 E.append(Paragraph(f'<b>Notebook en Google Colab:</b> <link href="{COLAB}" color="#1155CC"><u>abrir y ejecutar el cuaderno</u></link><br/>'
                    f'<b>Repositorio en GitHub:</b> <link href="{GH}" color="#1155CC"><u>{GH}</u></link>', sB))
 P("Las salidas mostradas se obtuvieron ejecutando el código de este documento.", sM)
+
+# ====================================================================== INTRODUCCION
+titulo("Introducción · Mapa de toda la unidad")
+P("La unidad se recorre en tres bloques que van de menos a más: primero el **vocabulario** (qué es un agente, un estado, una "
+  "recompensa…), después los **algoritmos** que permiten aprender (cómo se calcula Q y cómo se elige el método) y por último "
+  "los **tipos de refuerzo y modelos** (Markov, Q-learning) para analizar y diseñar agentes. Cada bloque tiene dos actividades.")
+figura("intro_mapa.png", figura_mapa_unidad(), maxh=FH - 125)
+
+titulo("Introducción · Cómo aprende un agente: el algoritmo Q-learning")
+P("Todo el aprendizaje por refuerzo de la unidad se resume en este ciclo. El agente repite los pasos 2 a 7 miles de veces; "
+  "con cada vuelta su tabla Q se parece un poco más a la verdad (Q*), y la política que resulta de elegir siempre el mayor Q es la óptima.")
+figura("intro_flujo.png", figura_flujo_qlearning(), maxh=FH - 80)
+
+titulo("Introducción · Fórmulas esenciales (1/2): cuánto vale cada cosa")
+figura("intro_formulas1.png", figura_formulas(1), maxh=FH - 40)
+
+titulo("Introducción · Fórmulas esenciales (2/2): cómo se aprende y se decide")
+figura("intro_formulas2.png", figura_formulas(2), maxh=FH - 40)
+
+titulo("Introducción · Los tres parámetros que controlan el aprendizaje: γ, α y ε")
+figura("intro_parametros.png", figura_parametros(), maxh=FH - 150)
+B(["**γ (descuento)**: cercano a 0 el agente es miope; cercano a 1 valora el largo plazo. Su horizonte efectivo es ≈ 1/(1−γ) pasos.",
+   "**α (tasa de aprendizaje)**: con α = 1 sustituye lo viejo por lo nuevo (rápido pero inestable); con α pequeña aprende lento pero suave.",
+   "**ε (exploración)**: con ε = 1 todo es azar; con ε pequeño casi siempre elige la mejor acción conocida. Se suele empezar alto y bajarlo."])
+
+titulo("Introducción · Glosario de símbolos")
+tabla(["Símbolo", "Se lee", "Significado", "Valores típicos"], [
+    ["s, s'", "estado, estado siguiente", "Situación actual y situación a la que llega el agente.", "S1, S2, S3…"],
+    ["a, A", "acción, conjunto de acciones", "Decisión que toma el agente; |A| es cuántas tiene.", "Izquierda, Derecha, Quedarse"],
+    ["r, R", "recompensa", "Número que entrega el entorno tras cada acción.", "+10, −1, −3…"],
+    ["π(s)", "política", "Regla que asigna una acción a cada estado.", "π*(S3) = Izquierda"],
+    ["G", "retorno", "Suma descontada de las recompensas futuras.", "G = 10.0"],
+    ["γ", "gamma (descuento)", "Cuánto vale el futuro frente al presente.", "0 ≤ γ ≤ 1 (0.9, 0.99)"],
+    ["α", "alfa (tasa de aprendizaje)", "Fracción del error que se corrige en cada actualización.", "0 < α ≤ 1 (0.1, 0.5)"],
+    ["ε", "épsilon (exploración)", "Probabilidad de elegir una acción al azar.", "0 ≤ ε ≤ 1 (1 → 0.05)"],
+    ["V(s)", "valor de estado", "Retorno esperado desde s siguiendo la política.", "V*(S2) = 28.95"],
+    ["Q(s,a)", "valor de acción", "Retorno esperado de hacer a en s y luego seguir la política.", "Q(S3,Izq) = 4.75"],
+    ["Q*", "Q óptima", "Valor de Q cuando se actúa de forma óptima.", "Q*(S3,Izq) = 31.05"],
+    ["δ", "delta (error TD)", "Diferencia entre el objetivo y la estimación actual.", "δ = 5.45"],
+    ["P(s'|s,a)", "probabilidad de transición", "Probabilidad de llegar a s' desde s con a (Markov).", "1 en entornos deterministas"]],
+    [W * .11, W * .22, W * .4, W * .27])
+
+titulo("Introducción · Gráfico explicativo: anatomía de una actualización de Q-learning")
+figura("intro_anatomia.png", figura_anatomia_update(), maxh=FH - 45)
 
 # ====================================================================== 1 TEORIA GENERAL
 titulo("1. Teoría general paso a paso")
