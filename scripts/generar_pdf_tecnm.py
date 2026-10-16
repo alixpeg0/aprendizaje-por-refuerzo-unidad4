@@ -58,6 +58,7 @@ E = []
 def md(t):
     t = t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+    t = re.sub(r"(?<![\w*])\*([^*\s][^*]*?)\*(?![\w*])", r"<i>\1</i>", t)
     return re.sub(r"`(.+?)`", r'<font name="DM" size="7.4">\1</font>', t)
 
 
