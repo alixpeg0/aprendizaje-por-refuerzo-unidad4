@@ -64,7 +64,18 @@ def md(t):
 
 def P(t, s=sB): E.append(Paragraph(md(t), s))
 def H(t): E.append(Paragraph(md(t), sH))
-def titulo(t): E.append(PageBreak()); E.append(Paragraph(md(t), sA))
+GH = "https://github.com/alixpeg0/aprendizaje-por-refuerzo-unidad4"
+COLAB = "https://colab.research.google.com/github/alixpeg0/aprendizaje-por-refuerzo-unidad4/blob/main/Unidad4_Aprendizaje_por_Refuerzo.ipynb"
+sLink = ParagraphStyle("lk", fontName="DV", fontSize=7.5, leading=10, textColor=colors.HexColor("#444"), spaceAfter=4)
+
+
+def enlaces():
+    return Paragraph(f'<link href="{COLAB}" color="#1155CC"><u>▶ Abrir en Google Colab</u></link>&nbsp;&nbsp;·&nbsp;&nbsp;'
+                     f'<link href="{GH}" color="#1155CC"><u>GitHub: alixpeg0/aprendizaje-por-refuerzo-unidad4</u></link>', sLink)
+
+
+def titulo(t):
+    E.append(PageBreak()); E.append(Paragraph(md(t), sA)); E.append(enlaces())
 def B(lista):
     for t in lista: E.append(Paragraph("•&nbsp;&nbsp;" + md(t), sL))
 def pasos(lista):
@@ -98,6 +109,13 @@ def tabla(cab, filas, anchos, negrita=True):
     E.append(t); E.append(Spacer(1, 5))
 
 
+def figura(nombre, fig, maxw=W, maxh=210):
+    ruta = raiz / "imagenes" / nombre
+    fig.savefig(ruta, dpi=140, bbox_inches="tight")
+    matplotlib.pyplot.close(fig)
+    imagen(ruta, maxw, maxh)
+
+
 def imagen(ruta, maxw=W, maxh=FH - 30):
     w, h = PI.open(ruta).size
     k = min(maxw / w, maxh / h)
@@ -117,8 +135,9 @@ tabla(["Sección", "Contenido"], [
     ["3", "Actividad 26 · Entorno propio (AspiBot)"], ["4", "Actividad 27 · Una iteración de Q-learning"],
     ["5", "Actividad 28 · Agente y elección de algoritmo"], ["6", "Actividad 29 · Nueva tabla Q (S3: +3 → +6)"],
     ["7", "Actividad 30 · Agente propio (SkyBot)"]], [W * .12, W * .5], False)
-P("Código ejecutable en Google Colab: github.com/alixpeg0/aprendizaje-por-refuerzo-unidad4. "
-  "Las salidas mostradas se obtuvieron ejecutando el código de este documento.", sM)
+E.append(Paragraph(f'<b>Notebook en Google Colab:</b> <link href="{COLAB}" color="#1155CC"><u>abrir y ejecutar el cuaderno</u></link><br/>'
+                   f'<b>Repositorio en GitHub:</b> <link href="{GH}" color="#1155CC"><u>{GH}</u></link>', sB))
+P("Las salidas mostradas se obtuvieron ejecutando el código de este documento.", sM)
 
 # ====================================================================== 1 TEORIA GENERAL
 titulo("1. Teoría general paso a paso")
@@ -178,6 +197,8 @@ pasos(["Para cada ejemplo, pregunta **quién aprende** (agente) y **con qué int
        "Explica el papel de la recompensa en cada caso."])
 H("Resultado")
 tabla(["Elemento", "a) Coche autónomo", "b) Videojuego", "c) Recomendador"], A25_FILAS, [W * .15, W * .29, W * .28, W * .28])
+H("Gráfico: ciclo agente–entorno de cada ejemplo")
+figura("act25_ciclos.png", figura_ciclo_ejemplos(), maxh=170)
 H("Papel de la recompensa en cada caso")
 for t, x in A25_RECOMPENSA:
     P(f"**{t}.** {x}")
@@ -281,6 +302,8 @@ _, p27 = simular_trayectoria(construir_entorno(3))
 tabla(["Paso", "s", "a", "r", "s'", "Q ant.", "max Q(s',·)", "Objetivo", "Error TD", "Q nuevo"],
       [[fmt(v) for v in f] for f in p27.drop(columns="Cálculo").itertuples(index=False)],
       [W * .07, W * .07, W * .15, W * .06, W * .07, W * .1, W * .14, W * .12, W * .11, W * .11], False)
+H("Gráfico: cómo evoluciona Q")
+figura("act27_q.png", figura_q_pasos(construir_entorno(3)), maxh=190)
 H("Conclusión")
 for x in A27_CONCLUSION:
     P(x)
@@ -316,8 +339,8 @@ tabla(["Algoritmo", "Familia", "Ideal cuando…", "¿Para este agente?"], A28_CO
 H("Por qué no basta una tabla Q y cómo se calcula el objetivo de DQN")
 codigo('''
 import numpy as np
-# --- 1) ¿Cabe una tabla Q? 4 carriles con filas de 0..30 autos, 4 fases, espera en 10 niveles
-n_estados = (31 ** 4) * 4 * 10
+# --- 1) ¿Cabe una tabla Q? 4 carriles: fila de 0..30 autos y espera en 10 niveles por carril, 4 fases
+n_estados = (31 ** 4) * (10 ** 4) * 4
 print(f"Estados posibles: {n_estados:,}  x 2 acciones = {n_estados*2:,} celdas Q")
 
 # --- 2) Recompensa del controlador
@@ -332,6 +355,9 @@ r = recompensa_semaforo(12, True, False)
 y = r + gamma * q_red_objetivo_siguiente.max()
 print("Objetivo DQN y =", round(y, 2), " (la red se entrena para acercar Q(s,a) a y)")
 ''')
+
+H("Gráfico: crecimiento de la tabla Q y árbol de decisión")
+figura("act28_algoritmo.png", figura_algoritmo(), maxh=200)
 
 # ====================================================================== ACT 29
 titulo("6. Actividad 29 · Calcula tu propia tabla Q")
@@ -368,7 +394,9 @@ print("Política nueva   :", politica(Qs6).to_dict())
 Qe = entrenar_q_learning(T6, episodios=500)
 print("\\nPolítica aprendida por Q-learning:", politica(Qe).to_dict())
 ''')
+H("Gráficos: políticas óptimas y umbral de la recompensa")
 imagen(raiz / "imagenes" / "act29_politicas.png", W * .9, 170)
+figura("act29_umbral.png", figura_umbral(), maxw=W * .75, maxh=210)
 H("Análisis")
 for x in A29_ANALISIS:
     P(x)
@@ -423,6 +451,8 @@ for eps in (1.0, 0.5, 0.05):
     print(f"epsilon={eps:4}: elige 'avanzar' (la mejor) el {elecciones.count('avanzar')/10:.1f}% de las veces")
 ''')
 P("Al bajar ε, SkyBot explota cada vez más lo aprendido: así se refleja que su comportamiento se adapta con el tiempo.")
+H("Gráficos: recompensas de SkyBot y efecto de ε")
+figura("act30_skybot.png", figura_skybot(), maxh=200)
 
 doc.build(E)
 print("OK", doc.filename)

@@ -281,3 +281,139 @@ def figura_rejilla(env, retornos, longitudes, ruta, k=20):
     axs[2].set(title="Ruta aprendida (política greedy)", xticks=range(env.n), yticks=range(env.n))
     fig.tight_layout()
     return fig
+
+
+# ----------------------------------------------------------------------------
+# 6. Figuras por actividad (25, 27, 28, 29, 30)
+# ----------------------------------------------------------------------------
+def figura_ciclo_ejemplos():
+    """Act. 25: ciclo agente-entorno de cada uno de los tres ejemplos."""
+    datos = [
+        ("a) Coche autónomo", "Sistema de\nconducción", "Estacionamiento\n(cajones, autos)",
+         "acción: volante,\nacelerar, frenar", "estado: posición, sensores\nr: +100 / −50 / −1"),
+        ("b) Videojuego", "Personaje\n(IA)", "Nivel del juego\n(monedas, enemigos)",
+         "acción: mover,\nsaltar, esperar", "estado: posiciones, vidas\nr: +1 moneda / −10 enemigo"),
+        ("c) Recomendador", "Algoritmo\nrecomendador", "Usuario y catálogo\nde películas",
+         "acción: recomendar\nla película X", "estado: perfil, historial\nr: +1 la ve / −1 la ignora"),
+    ]
+    fig, axs = plt.subplots(1, 3, figsize=(15, 4.6))
+    for ax, (t, ag, en, acc, resp) in zip(axs, datos):
+        ax.set_xlim(-1.6, 7.6); ax.set_ylim(0, 6); ax.axis("off")
+        ax.set_title(t, fontsize=13, color=AZUL, fontweight="bold")
+        _caja(ax, (0.9, 4.0), 4.2, 1.4, ag, AZUL, 10)
+        _caja(ax, (0.9, 0.5), 4.2, 1.4, en, GUINDA, 9.5)
+        _flecha(ax, (2.0, 4.0), (2.0, 1.9), color=AZUL)
+        _flecha(ax, (4.0, 1.9), (4.0, 4.0), color=GUINDA)
+        ax.text(0.95, 2.95, acc, ha="right", va="center", fontsize=8.5, color=AZUL)
+        ax.text(4.3, 2.95, resp, ha="left", va="center", fontsize=8.5, color=GUINDA)
+    fig.suptitle("Ciclo agente–entorno de cada ejemplo", fontsize=14, color=AZUL, fontweight="bold")
+    fig.tight_layout()
+    return fig
+
+
+def figura_q_pasos(T, trayectoria=None, alpha=0.5, gamma=0.9):
+    """Act. 27: evolución de los Q actualizados y tabla final."""
+    trayectoria = trayectoria or TRAYECTORIA
+    Q = q_vacia()
+    hist = [Q.copy()]
+    for s, a in trayectoria:
+        s2, r = T[(s, a)]
+        actualizar_q(Q, s, a, r, s2, alpha, gamma)
+        hist.append(Q.copy())
+    pares = list(dict.fromkeys(trayectoria))
+    fig, axs = plt.subplots(1, 2, figsize=(13, 4.2), gridspec_kw=dict(width_ratios=[1.5, 1]))
+    pal = [AZUL, GUINDA, DORADO, "#2E7D4F"]
+    for (s, a), col in zip(pares, pal):
+        axs[0].plot(range(len(hist)), [h.loc[s, a] for h in hist], "-o", color=col, lw=2, label=f"Q({s},{a})")
+    axs[0].set(title="Evolución de Q en las 6 actualizaciones", xlabel="paso", ylabel="valor Q",
+               xticks=range(len(hist)))
+    axs[0].grid(alpha=.3); axs[0].legend()
+    im = axs[1].imshow(Q.values, cmap="YlGnBu", aspect="auto")
+    axs[1].set_xticks(range(3)); axs[1].set_xticklabels(ACCIONES)
+    axs[1].set_yticks(range(3)); axs[1].set_yticklabels(ESTADOS)
+    for i in range(3):
+        for j in range(3):
+            axs[1].text(j, i, f"{Q.values[i, j]:.2f}", ha="center", va="center",
+                        color="white" if Q.values[i, j] > Q.values.max() * .55 else "black")
+    axs[1].set_title("Tabla Q final")
+    fig.tight_layout()
+    return fig
+
+
+def figura_algoritmo():
+    """Act. 28: crecimiento de la tabla Q y árbol de decisión del algoritmo."""
+    fig, axs = plt.subplots(1, 2, figsize=(14, 4.6), gridspec_kw=dict(width_ratios=[1, 1.25]))
+    n = np.arange(1, 41)
+    celdas = (n + 1.0) ** 4 * 10 ** 4 * 4 * 2
+    axs[0].semilogy(n, celdas, color=AZUL, lw=2.5, label="celdas de la tabla Q")
+    axs[0].axhline(1e9, color=GUINDA, ls="--", label="≈ límite práctico (memoria y visitas)")
+    axs[0].axvline(30, color=DORADO, ls=":", label="cruce real (hasta 30 autos)")
+    axs[0].set(title="La tabla Q no escala", xlabel="máx. de autos por carril", ylabel="celdas Q (escala log)")
+    axs[0].legend(fontsize=8); axs[0].grid(alpha=.3, which="both")
+
+    ax = axs[1]
+    ax.set_xlim(0, 10); ax.set_ylim(0, 6); ax.axis("off")
+    ax.set_title("¿Qué algoritmo elegir?", fontsize=12)
+    _caja(ax, (0.2, 4.6), 2.6, 0.9, "¿Pocos estados\ny acciones?", DORADO, 9)
+    _caja(ax, (3.9, 4.6), 2.6, 0.9, "¿Acciones\ncontinuas?", DORADO, 9)
+    _caja(ax, (7.3, 4.6), 2.5, 0.9, "¿Se puede\nsimular?", DORADO, 9)
+    _caja(ax, (0.2, 2.2), 2.6, 0.9, "Q-learning\ntabular", AZUL, 9)
+    _caja(ax, (3.9, 2.2), 2.6, 0.9, "PPO / SAC", AZUL, 9)
+    _caja(ax, (7.3, 2.2), 2.5, 0.9, "Dyna-Q /\nbasados en modelo", AZUL, 9)
+    _caja(ax, (3.9, 0.2), 2.6, 0.9, "DQN  ✔ (semáforo)", GUINDA, 9.5)
+    _flecha(ax, (1.5, 4.6), (1.5, 3.1), "sí")
+    _flecha(ax, (2.8, 5.05), (3.9, 5.05), "no")
+    _flecha(ax, (5.2, 4.6), (5.2, 3.1), "sí")
+    _flecha(ax, (6.5, 5.05), (7.3, 5.05), "no")
+    _flecha(ax, (8.5, 4.6), (8.5, 3.1), "sí")
+    _flecha(ax, (7.5, 4.6), (6.3, 1.1), "no")
+    fig.tight_layout()
+    return fig
+
+
+def figura_umbral():
+    """Act. 29: Q*(S3,·) según la recompensa de (S3,Quedarse)."""
+    rs = np.arange(0, 8.01, 0.25)
+    qq, qi = [], []
+    for r in rs:
+        Q = q_optima(construir_entorno(r), iteraciones=200)
+        qq.append(Q.loc["S3", "Quedarse"]); qi.append(Q.loc["S3", "Izquierda"])
+    fig, ax = plt.subplots(figsize=(9, 4.2))
+    ax.plot(rs, qq, color=GUINDA, lw=2.5, label="Q*(S3, Quedarse)")
+    ax.plot(rs, qi, color=AZUL, lw=2.5, label="Q*(S3, Izquierda)  (ciclo S3↔S2)")
+    ax.axvline(5.9 / 1.9, color="gray", ls="--")
+    ax.text(5.9 / 1.9 + .08, min(qi) + 1, "umbral ≈ 3.105", fontsize=9)
+    for r, c in ((3, DORADO), (6, "#2E7D4F")):
+        ax.axvline(r, color=c, ls=":")
+        ax.text(r + .05, max(qq) * .93, f"r = +{r}", color=c, fontsize=10, fontweight="bold")
+    ax.set(title="¿Cuándo conviene quedarse? Efecto de la recompensa", xlabel="recompensa de (S3, Quedarse)",
+           ylabel="valor Q óptimo")
+    ax.grid(alpha=.3); ax.legend()
+    fig.tight_layout()
+    return fig
+
+
+def figura_skybot():
+    """Act. 30: recompensas de SkyBot y cómo ε cambia su conducta."""
+    eventos = ["Entrega", "Carga a tiempo", "Paso normal", "Choca", "Cae sin batería"]
+    vals = [19, 4, -1, -11, -31]
+    cols = ["#2E7D4F", "#2E7D4F", DORADO, GUINDA, GUINDA]
+    fig, axs = plt.subplots(1, 2, figsize=(13, 4.2))
+    axs[0].barh(eventos[::-1], vals[::-1], color=cols[::-1])
+    for i, v in enumerate(vals[::-1]):
+        axs[0].text(v + (1 if v >= 0 else -1), i, f"{v:+d}", va="center", ha="left" if v >= 0 else "right")
+    axs[0].axvline(0, color="black", lw=.8)
+    axs[0].set(title="Recompensa neta por evento (incluye −1 por paso)", xlabel="r")
+    axs[0].set_xlim(-38, 26)
+    eps = np.linspace(0, 1, 51)
+    axs[1].plot(eps, 100 * ((1 - eps) + eps / 3), color=AZUL, lw=2.5, label="teórico: (1−ε) + ε/3")
+    rng = np.random.default_rng(0)
+    for e in (1.0, 0.5, 0.05):
+        sims = [(rng.random() >= e) or (rng.integers(3) == 1) for _ in range(1000)]
+        axs[1].plot(e, 100 * np.mean(sims), "o", color=GUINDA, ms=9)
+    axs[1].plot([], [], "o", color=GUINDA, label="simulación (1000 decisiones)")
+    axs[1].set(title="Al bajar ε, SkyBot elige más la mejor acción", xlabel="ε (exploración)",
+               ylabel="% de veces que elige la mejor acción")
+    axs[1].invert_xaxis(); axs[1].grid(alpha=.3); axs[1].legend()
+    fig.tight_layout()
+    return fig

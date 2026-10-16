@@ -288,8 +288,8 @@ P("Primero se muestra el tamaño de la tabla Q si se discretiza el cruce; despu�
   "(igual que Q-learning, pero con una red que estima Q).")
 codigo('''
 import numpy as np
-# --- 1) ¿Cabe una tabla Q? 4 carriles con filas de 0..30 autos, 4 fases, espera en 10 niveles
-n_estados = (31 ** 4) * 4 * 10
+# --- 1) ¿Cabe una tabla Q? 4 carriles: fila de 0..30 autos y espera en 10 niveles por carril, 4 fases
+n_estados = (31 ** 4) * (10 ** 4) * 4
 print(f"Estados posibles: {n_estados:,}  x 2 acciones = {n_estados*2:,} celdas Q")
 
 # --- 2) Recompensa del controlador

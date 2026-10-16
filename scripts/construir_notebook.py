@@ -53,6 +53,11 @@ code("""
 act25 = tabla(A25_COLUMNAS, A25_FILAS)
 display(act25.style.set_properties(**{"text-align": "left", "white-space": "pre-wrap"}).hide(axis="index"))
 """)
+md("### Gráfico: ciclo agente–entorno de cada ejemplo")
+code("""
+figura_ciclo_ejemplos()
+plt.show()
+""")
 md("### Papel de la recompensa en cada caso")
 code("""
 for titulo, texto in A25_RECOMPENSA:
@@ -113,6 +118,11 @@ display(Q27.round(4))
 mejor = Q27.stack().idxmax()
 print(f"Valor Q más alto: Q{mejor} = {Q27.stack().max():.4f}")
 """)
+md("### Gráfico: cómo evoluciona Q en las 6 actualizaciones")
+code("""
+figura_q_pasos(T)
+plt.show()
+""")
 md("### Conclusión")
 code("""
 for p in A27_CONCLUSION:
@@ -132,6 +142,11 @@ display(Markdown("### Comparación de familias de algoritmos para este problema"
 display(tabla(["Algoritmo", "Familia", "Ideal cuando…", "¿Para este agente?"], A28_COMPARATIVA).style.set_properties(**{"text-align": "left"}).hide(axis="index"))
 """)
 
+md("### Gráfico: la tabla Q no escala y qué algoritmo elegir")
+code("""
+figura_algoritmo()
+plt.show()
+""")
 # --------------------------------------------------------------- ACT 29
 md(r"""
 # Actividad 29. Calcula tu propia tabla Q
@@ -159,6 +174,11 @@ display(Markdown("**Política (mejor acción por estado)**"))
 display(pd.DataFrame({"Original (+3)": politica(Q_orig), "Nueva (+6)": politica(Q_new)}))
 figura_politicas(Q_orig, Q_new); plt.show()
 """)
+md("### Gráfico: ¿a partir de qué recompensa conviene quedarse?")
+code("""
+figura_umbral()
+plt.show()
+""")
 md("### Comprobación: Q-learning entrenado (no solo la solución exacta)")
 code("""
 Q_ent = entrenar_q_learning(T6, episodios=500)
@@ -182,6 +202,11 @@ code("""
 display(Markdown(f"## {A30_TITULO}\\n\\n**Propósito.** {A30_PROPOSITO}"))
 display(pd.DataFrame([A30_FILA], columns=A30_COLUMNAS).style.set_properties(**{"text-align": "left", "white-space": "pre-wrap"}).hide(axis="index"))
 display(Markdown("### Tipo de refuerzo y adaptación en el tiempo\\n\\n" + A30_TIPO_Y_ADAPTACION))
+""")
+md("### Gráfico: recompensas de SkyBot y efecto de ε")
+code("""
+figura_skybot()
+plt.show()
 """)
 md("""
 ---
