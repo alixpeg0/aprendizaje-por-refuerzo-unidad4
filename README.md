@@ -9,7 +9,8 @@ Cuaderno de trabajo resuelto · Maestría en Inteligencia Artificial · TecNM Vi
 | Archivo | Descripción |
 |---|---|
 | [`Unidad4_Aprendizaje_por_Refuerzo.ipynb`](Unidad4_Aprendizaje_por_Refuerzo.ipynb) | **Notebook de Colab**: teoría, esquema y Actividades 25–30 resueltas con código |
-| [`pdfs/`](pdfs) | Un PDF entregable por actividad (25 a 30) |
+| [`pdfs/Unidad4_Aprendizaje_por_Refuerzo_Completo.pdf`](pdfs/Unidad4_Aprendizaje_por_Refuerzo_Completo.pdf) | **PDF único vertical**: teoría, esquema y cada actividad paso a paso con código y salida |
+| [`pdfs/`](pdfs) | Además, un PDF entregable por actividad (25 a 30) |
 | [`imagenes/esquema_teoria.png`](imagenes/esquema_teoria.png) | Esquema de la teoría |
 | `rl_core.py`, `contenido.py` | Código y respuestas compartidos por el notebook y los PDFs |
 | `scripts/` | Generadores del notebook y de los PDFs |
